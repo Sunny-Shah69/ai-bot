@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>J_ARIS BOT</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<script>
+tailwind.config = { darkMode: 'class' }
+</script>
+
+<style>
+body { font-family: Inter, sans-serif; }
+::-webkit-scrollbar { display: none; }
+
+/* subtle gradient background */
+.bg-soft {
+  background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+}
+.dark .bg-soft {
+  background: linear-gradient(135deg, #0f172a, #020617);
+}
+</style>
+</head>
+
+<body class="bg-soft min-h-screen text-gray-900 dark:text-gray-100">
+
+<!-- HEADER -->
+<header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-fuchsia-500 text-white px-6 py-3 flex justify-between items-center shadow">
+  <div class="font-bold text-lg tracking-wide">🤖 J_ARIS BOT</div>
+  <button onclick="toggleTheme()" class="px-3 py-1 rounded-full bg-white/20">
+    🌙 / ☀️
+  </button>
+</header>
+
+<!-- CHAT AREA -->
+<main class="max-w-3xl mx-auto px-4 py-6 pb-24">
+  <div id="chat"
+    class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-4 min-h-[60vh] space-y-4">
+
+    <div id="starter" class="text-center text-gray-600 dark:text-gray-400 py-20">
+      <p class="font-semibold text-gray-800 dark:text-gray-200">
+        J_ARIS is ready 😈📘
+      </p>
+      <p class="mt-2 text-sm">
+        Hardcore JEE • PW vibes • No ratta
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<!-- INPUT -->
+<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t dark:border-zinc-800">
+  <div class="max-w-3xl mx-auto px-4 py-3 flex gap-3">
+    <textarea
+      id="input"
+      rows="1"
+      placeholder="Bol kya poochna hai… (Enter to send)"
+      class="flex-1 resize-none px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-700
+             bg-white dark:bg-zinc-800
+             text-gray-900 dark:text-gray-100
+             placeholder-gray-500 dark:placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-indigo-500"
+    ></textarea>
+
+    <button
+      onclick="sendMessage()"
+      class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">
+      Send
+    </button>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const GROQ_API_KEY = "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";
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const starter = document.getElementById("starter");
+
+/* ================= THEME ================= */
+function toggleTheme() {
+  document.documentElement.classList.toggle("dark");
+  localStorage.theme =
+    document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+if (localStorage.theme === "dark") {
+  document.documentElement.classList.add("dark");
+}
+
+/* ================= KNOWLEDGE INJECTION ================= */
+const PHYSICS_WALLAH_CONTEXT = `
+You are J_ARIS BOT.
+
+You teach Physics EXACTLY like Saleem Sir (Physics Wallah / JEE Wallah – Advanced batch).
+
+VERY IMPORTANT:
+- You must reply ONLY in Hinglish and English.
+- Do NOT use pure Hindi or any other language.
+
+PERSONALITY:
+- Extremely chill, full nonsense but educational
+- Mentor + friend vibes
+- Light scolding for silly doubts
+- Motivational but sharp
+- Rank-oriented but student-friendly
+
+LANGUAGE STYLE:
+- Hinglish + English only
+- Short, punchy lines
+- Use phrases like:
+  "Sun dhyaan se"
+  "Yeh Advanced ka sawal hai"
+  "Is level pe yeh galti allowed nahi hai"
+  "JEE Advanced me yahi game hota hai"
+  "Soch, formula mat rat"
+  "pen tod ke dikhao"
+  "skc likh le"
+
+TEACHING STYLE:
+- First principles ALWAYS
+- No direct formula jumping
+- Logical derivation compulsory
+- Use vectors, calculus, symmetry, energy methods
+- Limiting cases zaroor check karo
+- Ask: "Order of magnitude kya bol raha hai?"
+- Use humorous names like "Thanos wala sawal"
+
+CONTENT RULES:
+- Student is preparing for Boards + JEE Main + JEE Advanced
+- NCERT is baseline, not ceiling
+- Show wrong approaches and say "AUR YE GALAT HAI"
+- Explain examiner mindset
+- Compare Mains vs Advanced clearly
+
+PROBLEM SOLVING FLOW:
+1. Physical situation samjho
+2. Assumptions likho
+3. Coordinate system choose karo
+4. Laws lagao (formula nahi)
+5. Limiting cases check karo
+
+IMPORTANT:
+- Kabhi kabhi oversimplify allowed
+- Spoon-feeding nahi
+- Vague question ho to student ko tok ke clarify karwao
+- Easy ho to harder twist add karo
+`;
+
+/* ================= CHAT UI ================= */
+function bubble(text, who) {
+  starter?.remove();
+
+  const wrap = document.createElement("div");
+  wrap.className = who === "user" ? "text-right" : "text-left";
+
+  const b = document.createElement("div");
+  b.className =
+    who === "user"
+      ? "inline-block bg-indigo-600 text-white px-4 py-2 rounded-xl rounded-br-none max-w-[75%]"
+      : "inline-block bg-gray-100 dark:bg-zinc-800 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
+
+  b.innerText = text;
+  wrap.appendChild(b);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+/* ================= SEND ================= */
+async function sendMessage() {
+  const q = input.value.trim();
+  if (!q) return;
+
+  bubble(q, "user");
+  input.value = "";
+
+  const thinking = document.createElement("div");
+  thinking.className = "text-sm text-gray-500 dark:text-gray-400";
+  thinking.innerText = "J_ARIS soch raha hai…";
+  chat.appendChild(thinking);
+  chat.scrollTop = chat.scrollHeight;
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system", content: PHYSICS_WALLAH_CONTEXT },
+          { role: "user", content: q }
+        ]
+      })
+    });
+
+    const data = await res.json();
+    thinking.remove();
+    bubble(data.choices[0].message.content, "bot");
+
+  } catch (e) {
+    thinking.remove();
+    bubble("❌ Kuch gadbad ho gayi. Phir try kar.", "bot");
+  }
+}
+
+/* ================= ENTER ================= */
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+</script>
+
+</body>
+</html>
