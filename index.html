@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>J_ARIS BOT</title>
+<title>J_ARIS</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <script>
 tailwind.config = { darkMode: 'class' }
@@ -16,186 +16,163 @@ tailwind.config = { darkMode: 'class' }
 body { font-family: Inter, sans-serif; }
 ::-webkit-scrollbar { display: none; }
 
-.bg-soft {
-  background: linear-gradient(135deg, #eef2ff, #fdf2f8);
+/* animated gradient background */
+.bg-animated {
+  background: linear-gradient(-45deg, #0f172a, #020617, #020617, #0f172a);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
 }
-.dark .bg-soft {
-  background: linear-gradient(135deg, #0f172a, #020617);
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 </style>
 </head>
 
-<body class="bg-soft min-h-screen text-gray-900 dark:text-gray-100">
+<body class="bg-animated min-h-screen text-gray-100">
 
-<!-- ================= HEADER ================= -->
-<header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-fuchsia-500 text-white px-6 py-3 flex justify-between items-center">
-  <div class="font-bold text-lg">🤖 J_ARIS</div>
-  <button onclick="toggleTheme()" class="px-3 py-1 rounded-full bg-white/20">🌙 / ☀️</button>
+<!-- TOP BAR -->
+<header class="sticky top-0 z-10 bg-[#0b1a2d] border-b border-blue-900/40 px-6 py-3 flex justify-between items-center">
+  <div class="font-semibold text-lg tracking-wide">J_ARIS</div>
+  <span class="text-xs text-blue-400">online</span>
 </header>
 
-<!-- ================= HOME SCREEN ================= -->
-<section id="homeScreen" class="max-w-3xl mx-auto px-6 py-20 text-center">
-  <h1 class="text-4xl font-bold mb-4">Welcome to J_ARIS</h1>
-  <p class="text-gray-600 dark:text-gray-400 mb-8">
-    A focused AI study assistant for JEE aspirants.<br>
-    Ask normally — or switch to PW Advanced mode for deep physics.
-  </p>
-
-  <div class="grid gap-4 text-left bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-lg mb-10">
-    <p>✔ Clean & professional responses</p>
-    <p>✔ Optional PW Advanced physics mode</p>
-    <p>✔ Class 11 & 12 JEE syllabus reference</p>
-    <p>✔ Distraction-free study experience</p>
-  </div>
-
-  <button onclick="enterBot()"
-    class="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-lg">
-    Enter J_ARIS →
-  </button>
-</section>
-
-<!-- ================= CHAT SCREEN ================= -->
-<main id="chatScreen" class="hidden max-w-3xl mx-auto px-4 py-6 pb-40">
-
-  <!-- MODE SWITCH -->
-  <div class="flex gap-2 mb-3">
-    <button id="normalBtn" onclick="setMode('normal')"
-      class="px-4 py-1.5 rounded-full text-sm font-semibold bg-indigo-600 text-white">
-      🧠 Normal
-    </button>
-    <button id="pwBtn" onclick="setMode('pw')"
-      class="px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 dark:bg-zinc-700">
-      🔥 PW Advanced
-    </button>
-  </div>
-
+<!-- CHAT AREA -->
+<main class="max-w-3xl mx-auto px-4 py-6 pb-28">
   <div id="chat"
-    class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-4 min-h-[60vh] space-y-4">
+    class="bg-[#020617]/80 backdrop-blur rounded-2xl border border-blue-900/30 p-4 min-h-[65vh] space-y-4">
 
-    <div id="starter" class="text-center text-gray-600 dark:text-gray-400 py-20">
-      <p class="font-semibold">J_ARIS is ready.</p>
-      <p class="text-sm mt-2">Normal mode enabled.</p>
+    <div id="starter" class="text-center text-gray-400 py-20">
+      <p class="font-medium text-gray-200">J_ARIS is ready.</p>
+      <p class="text-sm mt-2">
+        Ask anything. English by default.
+      </p>
     </div>
 
   </div>
 </main>
 
-<!-- ================= INPUT ================= -->
-<div id="inputBar" class="hidden fixed bottom-12 left-0 right-0 bg-white dark:bg-zinc-900 border-t dark:border-zinc-800">
+<!-- INPUT -->
+<div class="fixed bottom-0 left-0 right-0 bg-[#020617]/90 backdrop-blur border-t border-blue-900/40">
   <div class="max-w-3xl mx-auto px-4 py-3 flex gap-3">
-    <textarea id="input" rows="1"
-      placeholder="Type your message… (Enter to send)"
-      class="flex-1 resize-none px-3 py-2 rounded-lg border dark:border-zinc-700 dark:bg-zinc-800"></textarea>
+    <textarea
+      id="input"
+      rows="1"
+      placeholder="Type a message… (Enter to send)"
+      class="flex-1 resize-none px-3 py-2 rounded-lg
+             bg-[#020617] text-gray-100
+             border border-blue-900/40
+             placeholder-gray-500
+             focus:outline-none focus:ring-2 focus:ring-blue-600"
+    ></textarea>
 
-    <button onclick="sendMessage()"
-      class="px-5 py-2 rounded-lg bg-indigo-600 text-white font-semibold">
+    <button
+      id="sendBtn"
+      class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">
       Send
     </button>
   </div>
 </div>
 
-<!-- ================= SYLLABUS BAR ================= -->
-<div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-zinc-900 border-t dark:border-zinc-800">
-  <div class="max-w-3xl mx-auto px-4 py-2 flex gap-2 text-sm">
-    <button onclick="toggleSyllabus('11')"
-      class="px-3 py-1 rounded-full bg-gray-200 dark:bg-zinc-700">
-      Class 11 Syllabus
-    </button>
-    <button onclick="toggleSyllabus('12')"
-      class="px-3 py-1 rounded-full bg-gray-200 dark:bg-zinc-700">
-      Class 12 Syllabus
-    </button>
-  </div>
-
-  <div id="syllabusBox"
-    class="hidden max-w-3xl mx-auto px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
-  </div>
-</div>
-
 <script>
-/* ========== CONFIG ========== */
+/* ================= CONFIG ================= */
 const GROQ_API_KEY = "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";
-let currentMode = "normal";
 
-/* ========== THEME ========== */
-function toggleTheme() {
-  document.documentElement.classList.toggle("dark");
+const chat = document.getElementById("chat");
+const input = document.getElementById("input");
+const sendBtn = document.getElementById("sendBtn");
+const starter = document.getElementById("starter");
+
+/* ================= SYSTEM PROMPT ================= */
+const SYSTEM_CONTEXT = `
+You are J_ARIS, a calm and intelligent AI assistant.
+
+Language rules:
+- Respond in English ONLY.
+- Switch to Hinglish ONLY if the user explicitly asks for Hinglish.
+
+Behavior:
+- Be clear, respectful, and natural.
+- Do not assume the topic.
+- Answer only what is asked.
+- Keep explanations concise unless the user asks for depth.
+`;
+
+/* ================= UI ================= */
+function addBubble(text, who) {
+  starter?.remove();
+
+  const wrap = document.createElement("div");
+  wrap.className = who === "user" ? "text-right" : "text-left";
+
+  const bubble = document.createElement("div");
+  bubble.className =
+    who === "user"
+      ? "inline-block bg-blue-600 text-white px-4 py-2 rounded-xl rounded-br-none max-w-[75%]"
+      : "inline-block bg-[#020617] border border-blue-900/40 text-gray-100 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
+
+  bubble.innerText = text;
+  wrap.appendChild(bubble);
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
 }
 
-/* ========== HOME → CHAT ========== */
-function enterBot() {
-  document.getElementById("homeScreen").classList.add("hidden");
-  document.getElementById("chatScreen").classList.remove("hidden");
-  document.getElementById("inputBar").classList.remove("hidden");
-}
-
-/* ========== MODES ========== */
-function setMode(mode) {
-  currentMode = mode;
-}
-
-/* ========== SYLLABUS DATA ========== */
-const syllabus11 = [
-  "Units & Measurements",
-  "Kinematics",
-  "Laws of Motion",
-  "Work, Energy & Power",
-  "Centre of Mass & Rotational Motion",
-  "Gravitation",
-  "Thermodynamics",
-  "Oscillations & Waves"
-];
-
-const syllabus12 = [
-  "Electrostatics",
-  "Current Electricity",
-  "Magnetism",
-  "Electromagnetic Induction",
-  "AC",
-  "Ray Optics",
-  "Wave Optics",
-  "Dual Nature",
-  "Atoms & Nuclei",
-  "Semiconductors"
-];
-
-function toggleSyllabus(cls) {
-  const box = document.getElementById("syllabusBox");
-  box.classList.toggle("hidden");
-  const data = cls === "11" ? syllabus11 : syllabus12;
-  box.innerHTML = `<strong>Class ${cls} Physics:</strong><ul class="list-disc ml-5 mt-2">`
-    + data.map(i => `<li>${i}</li>`).join("") + "</ul>";
-}
-
-/* ========== BOT LOGIC (unchanged) ========== */
-const NORMAL_CONTEXT = "You are a formal, professional English assistant.";
-const PW_CONTEXT = "You are a physics-only advanced academic assistant.";
-
+/* ================= SEND ================= */
 async function sendMessage() {
-  const q = input.value.trim();
-  if (!q) return;
+  const text = input.value.trim();
+  if (!text) return;
+
+  addBubble(text, "user");
   input.value = "";
+  sendBtn.disabled = true;
 
-  const systemPrompt = currentMode === "pw" ? PW_CONTEXT : NORMAL_CONTEXT;
+  const thinking = document.createElement("div");
+  thinking.className = "text-sm text-gray-500";
+  thinking.innerText = "J_ARIS is thinking…";
+  chat.appendChild(thinking);
+  chat.scrollTop = chat.scrollHeight;
 
-  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + GROQ_API_KEY
-    },
-    body: JSON.stringify({
-      model: "llama-3.1-8b-instant",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: q }
-      ]
-    })
-  });
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + GROQ_API_KEY
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          { role: "system", content: SYSTEM_CONTEXT },
+          { role: "user", content: text }
+        ]
+      })
+    });
 
-  const data = await res.json();
-  alert(data.choices[0].message.content);
+    const data = await res.json();
+    thinking.remove();
+
+    addBubble(data.choices[0].message.content, "bot");
+
+  } catch (err) {
+    thinking.remove();
+    addBubble("Something went wrong. Please try again.", "bot");
+    console.error(err);
+  } finally {
+    sendBtn.disabled = false;
+  }
 }
+
+/* ================= EVENTS ================= */
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
 </script>
 
 </body>
