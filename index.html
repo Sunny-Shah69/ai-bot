@@ -16,7 +16,6 @@ tailwind.config = { darkMode: 'class' }
 body { font-family: Inter, sans-serif; }
 ::-webkit-scrollbar { display: none; }
 
-/* subtle gradient background */
 .bg-soft {
   background: linear-gradient(135deg, #eef2ff, #fdf2f8);
 }
@@ -29,24 +28,37 @@ body { font-family: Inter, sans-serif; }
 <body class="bg-soft min-h-screen text-gray-900 dark:text-gray-100">
 
 <!-- HEADER -->
-<header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-fuchsia-500 text-white px-6 py-3 flex justify-between items-center shadow">
-  <div class="font-bold text-lg tracking-wide">🤖 J_ARIS BOT</div>
-  <button onclick="toggleTheme()" class="px-3 py-1 rounded-full bg-white/20">
-    🌙 / ☀️
-  </button>
+<header class="sticky top-0 z-10 bg-gradient-to-r from-indigo-600 to-fuchsia-500 text-white px-6 py-3 flex justify-between items-center">
+  <div class="font-bold text-lg">🤖 J_ARIS BOT</div>
+  <button onclick="toggleTheme()" class="px-3 py-1 rounded-full bg-white/20">🌙 / ☀️</button>
 </header>
 
-<!-- CHAT AREA -->
-<main class="max-w-3xl mx-auto px-4 py-6 pb-24">
+<!-- CHAT -->
+<main class="max-w-3xl mx-auto px-4 py-6 pb-28">
+
+  <!-- MODE SWITCH -->
+  <div class="flex gap-2 mb-3">
+    <button id="normalBtn"
+      onclick="setMode('normal')"
+      class="px-4 py-1.5 rounded-full text-sm font-semibold bg-indigo-600 text-white">
+      🧠 Normal
+    </button>
+    <button id="pwBtn"
+      onclick="setMode('pw')"
+      class="px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-200">
+      🔥 PW Advanced
+    </button>
+  </div>
+
   <div id="chat"
     class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg p-4 min-h-[60vh] space-y-4">
 
     <div id="starter" class="text-center text-gray-600 dark:text-gray-400 py-20">
       <p class="font-semibold text-gray-800 dark:text-gray-200">
-        J_ARIS is ready 😈📘
+        J_ARIS is ready 🙂
       </p>
       <p class="mt-2 text-sm">
-        Hardcore JEE • PW vibes • No ratta
+        Normal mode ON. Ask anything.
       </p>
     </div>
 
@@ -59,7 +71,7 @@ body { font-family: Inter, sans-serif; }
     <textarea
       id="input"
       rows="1"
-      placeholder="Bol kya poochna hai… (Enter to send)"
+      placeholder="Type here… (Enter to send)"
       class="flex-1 resize-none px-3 py-2 rounded-lg border border-gray-300 dark:border-zinc-700
              bg-white dark:bg-zinc-800
              text-gray-900 dark:text-gray-100
@@ -69,7 +81,7 @@ body { font-family: Inter, sans-serif; }
 
     <button
       onclick="sendMessage()"
-      class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition">
+      class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
       Send
     </button>
   </div>
@@ -81,6 +93,7 @@ const GROQ_API_KEY = "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";
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
 const starter = document.getElementById("starter");
+let currentMode = "normal";
 
 /* ================= THEME ================= */
 function toggleTheme() {
@@ -92,63 +105,44 @@ if (localStorage.theme === "dark") {
   document.documentElement.classList.add("dark");
 }
 
-/* ================= KNOWLEDGE INJECTION ================= */
-const PHYSICS_WALLAH_CONTEXT = `
+/* ================= MODES ================= */
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById("normalBtn").className =
+    mode === "normal"
+      ? "px-4 py-1.5 rounded-full text-sm font-semibold bg-indigo-600 text-white"
+      : "px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-200";
+
+  document.getElementById("pwBtn").className =
+    mode === "pw"
+      ? "px-4 py-1.5 rounded-full text-sm font-semibold bg-red-600 text-white"
+      : "px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-200 dark:bg-zinc-700 text-gray-800 dark:text-gray-200";
+
+  starter?.remove();
+  bubble(
+    mode === "pw"
+      ? "🔥 PW Advanced mode ON. Physics only. No bakchodi."
+      : "🧠 Normal mode ON. Ask anything.",
+    "bot"
+  );
+}
+
+/* ================= PROMPTS ================= */
+const NORMAL_CONTEXT = `
 You are J_ARIS BOT.
+You are a sane, calm, general-purpose AI assistant.
+Answer ONLY what the user asks.
+Do not assume subject.
+Be helpful, clear, and neutral.
+Use Hinglish or English naturally.
+`;
 
-You teach Physics EXACTLY like Saleem Sir (Physics Wallah / JEE Wallah – Advanced batch). you teach in english and makes physics interesting, you talk very formally
-
-VERY IMPORTANT:
-- You must reply ONLY in Hinglish and English.
-- Do NOT use pure Hindi or any other language.
-
-PERSONALITY:
-- Extremely chill, full nonsense but educational
-- Mentor + friend vibes
-- Light scolding for silly doubts
-- Motivational but sharp
-- Rank-oriented but student-friendly
-
-LANGUAGE STYLE:
-- Hinglish + English only
-- Short, punchy lines
-- Use phrases like:
-  "Sun dhyaan se"
-  "Yeh Advanced ka sawal hai"
-  "Is level pe yeh galti allowed nahi hai"
-  "JEE Advanced me yahi game hota hai"
-  "Soch, formula mat rat"
-  "pen tod ke dikhao"
-  "skc likh le"
-
-TEACHING STYLE:
-- First principles ALWAYS
-- No direct formula jumping
-- Logical derivation compulsory
-- Use vectors, calculus, symmetry, energy methods
-- Limiting cases zaroor check karo
-- Ask: "Order of magnitude kya bol raha hai?"
-- Use humorous names like "Thanos wala sawal"
-
-CONTENT RULES:
-- Student is preparing for Boards + JEE Main + JEE Advanced
-- NCERT is baseline, not ceiling
-- Show wrong approaches and say "AUR YE GALAT HAI"
-- Explain examiner mindset
-- Compare Mains vs Advanced clearly
-
-PROBLEM SOLVING FLOW:
-1. Physical situation samjho
-2. Assumptions likho
-3. Coordinate system choose karo
-4. Laws lagao (formula nahi)
-5. Limiting cases check karo
-
-// IMPORTANT:
-// - Kabhi kabhi oversimplify allowed
-// - Spoon-feeding nahi
-// - Vague question ho to student ko tok ke clarify karwao
-// - Easy ho to harder twist add karo
+const PW_CONTEXT = `
+You are J_ARIS BOT in Physics Wallah (JEE Advanced) mode.
+Answer ONLY physics-related questions.
+Use Hinglish + English.
+Teach from first principles.
+If question is not physics, politely ask user to switch to Normal mode.
 `;
 
 /* ================= CHAT UI ================= */
@@ -182,7 +176,8 @@ async function sendMessage() {
   thinking.className = "text-sm text-gray-500 dark:text-gray-400";
   thinking.innerText = "J_ARIS is thinking…";
   chat.appendChild(thinking);
-  chat.scrollTop = chat.scrollHeight;
+
+  const systemPrompt = currentMode === "pw" ? PW_CONTEXT : NORMAL_CONTEXT;
 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -194,7 +189,7 @@ async function sendMessage() {
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: [
-          { role: "system", content: PHYSICS_WALLAH_CONTEXT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: q }
         ]
       })
@@ -204,9 +199,9 @@ async function sendMessage() {
     thinking.remove();
     bubble(data.choices[0].message.content, "bot");
 
-  } catch (e) {
+  } catch {
     thinking.remove();
-    bubble("❌ Kuch gadbad ho gayi. Phir try kar.", "bot");
+    bubble("❌ Error aaya. Thoda ruk ke try kar.", "bot");
   }
 }
 
@@ -221,4 +216,3 @@ input.addEventListener("keydown", e => {
 
 </body>
 </html>
-
