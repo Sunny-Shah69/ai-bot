@@ -16,14 +16,17 @@ tailwind.config = { darkMode: 'class' }
 body { font-family: Inter, sans-serif; }
 ::-webkit-scrollbar { display: none; }
 
-/* animated gradient background */
-.bg-animated {
-  background: linear-gradient(-45deg, #0f172a, #020617, #020617, #0f172a);
-  background-size: 400% 400%;
-  animation: gradientMove 15s ease infinite;
+/* light animated gradient */
+.bg-light {
+  background: linear-gradient(120deg, #e0e7ff, #fdf2f8, #ecfeff);
+  background-size: 300% 300%;
+  animation: move 18s ease infinite;
+}
+.dark .bg-light {
+  background: linear-gradient(120deg, #020617, #020617, #0f172a);
 }
 
-@keyframes gradientMove {
+@keyframes move {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
@@ -31,23 +34,43 @@ body { font-family: Inter, sans-serif; }
 </style>
 </head>
 
-<body class="bg-animated min-h-screen text-gray-100">
+<body class="bg-light min-h-screen text-gray-900 dark:text-gray-100">
 
 <!-- TOP BAR -->
-<header class="sticky top-0 z-10 bg-[#0b1a2d] border-b border-blue-900/40 px-6 py-3 flex justify-between items-center">
-  <div class="font-semibold text-lg tracking-wide">J_ARIS</div>
-  <span class="text-xs text-blue-400">online</span>
+<header class="sticky top-0 z-10 bg-white/70 dark:bg-[#020617]/80 backdrop-blur border-b border-gray-200 dark:border-blue-900/40 px-6 py-3 flex justify-between items-center">
+  <div>
+    <div class="font-bold text-lg tracking-wide">J_ARIS</div>
+    <div class="text-xs text-gray-500 dark:text-gray-400">
+      Your best physics helper (and more)
+    </div>
+  </div>
+
+  <div class="flex gap-2 items-center">
+    <button id="normalBtn" onclick="setMode('normal')"
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white">
+      Normal
+    </button>
+    <button id="pwBtn" onclick="setMode('pw')"
+      class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 dark:bg-zinc-700">
+      PW Kattar
+    </button>
+    <button onclick="toggleTheme()" class="px-3 py-1 rounded-full bg-gray-200 dark:bg-zinc-700">
+      🌙 / ☀️
+    </button>
+  </div>
 </header>
 
-<!-- CHAT AREA -->
+<!-- CHAT -->
 <main class="max-w-3xl mx-auto px-4 py-6 pb-28">
   <div id="chat"
-    class="bg-[#020617]/80 backdrop-blur rounded-2xl border border-blue-900/30 p-4 min-h-[65vh] space-y-4">
+    class="bg-white/80 dark:bg-[#020617]/80 backdrop-blur rounded-2xl border border-gray-200 dark:border-blue-900/40 p-4 min-h-[65vh] space-y-4">
 
-    <div id="starter" class="text-center text-gray-400 py-20">
-      <p class="font-medium text-gray-200">J_ARIS is ready.</p>
+    <div id="starter" class="text-center text-gray-600 dark:text-gray-400 py-20">
+      <p class="font-semibold text-gray-800 dark:text-gray-200">
+        J_ARIS is online 🚀
+      </p>
       <p class="text-sm mt-2">
-        Ask anything. English by default.
+        Friendly by default. Switch to PW Kattar when you want pain.
       </p>
     </div>
 
@@ -55,22 +78,22 @@ body { font-family: Inter, sans-serif; }
 </main>
 
 <!-- INPUT -->
-<div class="fixed bottom-0 left-0 right-0 bg-[#020617]/90 backdrop-blur border-t border-blue-900/40">
+<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#020617]/90 backdrop-blur border-t border-gray-200 dark:border-blue-900/40">
   <div class="max-w-3xl mx-auto px-4 py-3 flex gap-3">
     <textarea
       id="input"
       rows="1"
-      placeholder="Type a message… (Enter to send)"
+      placeholder="Ask something… (Enter to send)"
       class="flex-1 resize-none px-3 py-2 rounded-lg
-             bg-[#020617] text-gray-100
-             border border-blue-900/40
+             bg-white dark:bg-[#020617]
+             border border-gray-300 dark:border-blue-900/40
              placeholder-gray-500
-             focus:outline-none focus:ring-2 focus:ring-blue-600"
+             focus:outline-none focus:ring-2 focus:ring-indigo-500"
     ></textarea>
 
     <button
       id="sendBtn"
-      class="px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold">
+      class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
       Send
     </button>
   </div>
@@ -85,19 +108,78 @@ const input = document.getElementById("input");
 const sendBtn = document.getElementById("sendBtn");
 const starter = document.getElementById("starter");
 
-/* ================= SYSTEM PROMPT ================= */
-const SYSTEM_CONTEXT = `
-You are J_ARIS, a calm and intelligent AI assistant.
+let currentMode = "normal";
 
-Language rules:
-- Respond in English ONLY.
-- Switch to Hinglish ONLY if the user explicitly asks for Hinglish.
+/* ================= THEME ================= */
+function toggleTheme() {
+  document.documentElement.classList.toggle("dark");
+  localStorage.theme =
+    document.documentElement.classList.contains("dark") ? "dark" : "light";
+}
+if (localStorage.theme === "dark") {
+  document.documentElement.classList.add("dark");
+}
 
-Behavior:
-- Be clear, respectful, and natural.
-- Do not assume the topic.
-- Answer only what is asked.
-- Keep explanations concise unless the user asks for depth.
+/* ================= MODE SWITCH ================= */
+function setMode(mode) {
+  currentMode = mode;
+
+  document.getElementById("normalBtn").className =
+    mode === "normal"
+      ? "px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white"
+      : "px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 dark:bg-zinc-700";
+
+  document.getElementById("pwBtn").className =
+    mode === "pw"
+      ? "px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white"
+      : "px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 dark:bg-zinc-700";
+
+  addBubble(
+    mode === "pw"
+      ? "PW Kattar Advanced mode enabled. Physics only. No shortcuts."
+      : "Normal mode enabled. Friendly, clear, and helpful.",
+    "bot"
+  );
+}
+
+/* ================= PROMPTS ================= */
+const NORMAL_CONTEXT = `
+You are J_ARIS.
+
+Tone:
+- Friendly, witty, and intelligent
+- Light humor 
+- Never rude or vulgar
+ask how are you and stuff with user, maintain a freindly relation with user. 
+
+Rules:
+- Respond in English by default not too formal
+- Switch to Hinglish ONLY if the user explicitly asks
+- Answer only what is asked
+- Be concise unless depth is requested
+`;
+
+const PW_CONTEXT = `
+You are J_ARIS in Physics Wallah Kattar Advanced mode.
+
+Scope:
+- Physics questions focus and not on rote learninng
+- If the question is not physics, politely ask to switch to Normal mode
+
+Style:
+- cool hinglish saleem sir total pw jee wallah manzil marathon saleemian
+- Strong conceptual explanations
+- Use Saleem Sir–style teaching:
+  * first principles
+  * logical derivation
+  * common traps
+  * examiner mindset
+  trickcing student
+- Humor is allowed very humour
+say pen tod ke dikhao, kpp problem, skc is key word always use skc means saleemian khopcha concept, after every answer give skc which is summary in english and make it funny with references from interstellar and other movies
+
+Goal:
+- Train the student's thinking, not formula memorization
 `;
 
 /* ================= UI ================= */
@@ -110,8 +192,8 @@ function addBubble(text, who) {
   const bubble = document.createElement("div");
   bubble.className =
     who === "user"
-      ? "inline-block bg-blue-600 text-white px-4 py-2 rounded-xl rounded-br-none max-w-[75%]"
-      : "inline-block bg-[#020617] border border-blue-900/40 text-gray-100 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
+      ? "inline-block bg-indigo-600 text-white px-4 py-2 rounded-xl rounded-br-none max-w-[75%]"
+      : "inline-block bg-white dark:bg-[#020617] border border-gray-200 dark:border-blue-900/40 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
 
   bubble.innerText = text;
   wrap.appendChild(bubble);
@@ -129,10 +211,12 @@ async function sendMessage() {
   sendBtn.disabled = true;
 
   const thinking = document.createElement("div");
-  thinking.className = "text-sm text-gray-500";
+  thinking.className = "text-sm text-gray-500 dark:text-gray-400";
   thinking.innerText = "J_ARIS is thinking…";
   chat.appendChild(thinking);
   chat.scrollTop = chat.scrollHeight;
+
+  const systemPrompt = currentMode === "pw" ? PW_CONTEXT : NORMAL_CONTEXT;
 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -144,7 +228,7 @@ async function sendMessage() {
       body: JSON.stringify({
         model: "llama-3.1-8b-instant",
         messages: [
-          { role: "system", content: SYSTEM_CONTEXT },
+          { role: "system", content: systemPrompt },
           { role: "user", content: text }
         ]
       })
@@ -152,7 +236,6 @@ async function sendMessage() {
 
     const data = await res.json();
     thinking.remove();
-
     addBubble(data.choices[0].message.content, "bot");
 
   } catch (err) {
@@ -166,7 +249,6 @@ async function sendMessage() {
 
 /* ================= EVENTS ================= */
 sendBtn.addEventListener("click", sendMessage);
-
 input.addEventListener("keydown", e => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
