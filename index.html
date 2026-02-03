@@ -13,10 +13,10 @@ tailwind.config = { darkMode: 'class' }
 </script>
 
 <style>
-body { font-family: Inter, sans-serif; }
+body { font-family: Inter, sans-serif; cursor: none; }
 ::-webkit-scrollbar { display: none; }
 
-/* light animated gradient */
+/* animated gradient */
 .bg-light {
   background: linear-gradient(120deg, #e0e7ff, #fdf2f8, #ecfeff);
   background-size: 300% 300%;
@@ -31,10 +31,37 @@ body { font-family: Inter, sans-serif; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* mouse glow */
+#glow {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(99,102,241,0.25), transparent 60%);
+  transform: translate(-50%, -50%);
+  z-index: 0;
+}
+
+/* custom cursor */
+#cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: #6366f1;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
 </style>
 </head>
 
 <body class="bg-light min-h-screen text-gray-900 dark:text-gray-100">
+
+<div id="glow"></div>
+<div id="cursor"></div>
 
 <!-- TOP BAR -->
 <header class="sticky top-0 z-10 bg-white/70 dark:bg-[#020617]/80 backdrop-blur border-b border-gray-200 dark:border-blue-900/40 px-6 py-3 flex justify-between items-center">
@@ -61,7 +88,7 @@ body { font-family: Inter, sans-serif; }
 </header>
 
 <!-- CHAT -->
-<main class="max-w-3xl mx-auto px-4 py-6 pb-28">
+<main class="max-w-3xl mx-auto px-4 py-6 pb-28 relative z-10">
   <div id="chat"
     class="bg-white/80 dark:bg-[#020617]/80 backdrop-blur rounded-2xl border border-gray-200 dark:border-blue-900/40 p-4 min-h-[65vh] space-y-4">
 
@@ -78,7 +105,7 @@ body { font-family: Inter, sans-serif; }
 </main>
 
 <!-- INPUT -->
-<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#020617]/90 backdrop-blur border-t border-gray-200 dark:border-blue-900/40">
+<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-[#020617]/90 backdrop-blur border-t border-gray-200 dark:border-blue-900/40 z-10">
   <div class="max-w-3xl mx-auto px-4 py-3 flex gap-3">
     <textarea
       id="input"
@@ -101,7 +128,7 @@ body { font-family: Inter, sans-serif; }
 
 <script>
 /* ================= CONFIG ================= */
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = "PASTE_YOUR_GROQ_KEY_HERE";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
@@ -113,27 +140,11 @@ let currentMode = "normal";
 /* ================= THEME ================= */
 function toggleTheme() {
   document.documentElement.classList.toggle("dark");
-  localStorage.theme =
-    document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
-if (localStorage.theme === "dark") {
-  document.documentElement.classList.add("dark");
 }
 
 /* ================= MODE SWITCH ================= */
 function setMode(mode) {
   currentMode = mode;
-
-  document.getElementById("normalBtn").className =
-    mode === "normal"
-      ? "px-3 py-1 rounded-full text-xs font-semibold bg-indigo-600 text-white"
-      : "px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 dark:bg-zinc-700";
-
-  document.getElementById("pwBtn").className =
-    mode === "pw"
-      ? "px-3 py-1 rounded-full text-xs font-semibold bg-red-600 text-white"
-      : "px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 dark:bg-zinc-700";
-
   addBubble(
     mode === "pw"
       ? "PW Kattar Advanced mode enabled. Physics only. No shortcuts."
@@ -142,8 +153,7 @@ function setMode(mode) {
   );
 }
 
-/* ================= PROMPTS ================= */
-const NORMAL_CONTEXT = `
+/* ================= PROMPTS (UNCHANGED TEXT) ================= */
 const NORMAL_CONTEXT = `
 You are J_ARIS, a study-focused academic assistant.
 
@@ -165,7 +175,6 @@ Behavior:
 Goal:
 Help the student understand concepts and solve problems.
 `;
-
 
 const PW_CONTEXT = `
 You are J_ARIS in PW Kattar Advanced mode.
@@ -189,7 +198,6 @@ When the input is NOT physics:
 - Politely say this mode is for physics only.
 - Suggest switching to Normal mode.
 
-
 Tone:
 - jokes like saleem sir very humourous tone
 - give skc after solving everyqeustion and skc means shortcut method or short summary
@@ -197,11 +205,9 @@ Tone:
 - use references from various movies and tv shows while giving skc but skc should always be in hinglish
 `;
 
-
 /* ================= UI ================= */
 function addBubble(text, who) {
   starter?.remove();
-
   const wrap = document.createElement("div");
   wrap.className = who === "user" ? "text-right" : "text-left";
 
@@ -209,7 +215,7 @@ function addBubble(text, who) {
   bubble.className =
     who === "user"
       ? "inline-block bg-indigo-600 text-white px-4 py-2 rounded-xl rounded-br-none max-w-[75%]"
-      : "inline-block bg-white dark:bg-[#020617] border border-gray-200 dark:border-blue-900/40 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
+      : "inline-block bg-white dark:bg-[#020617] border border-gray-200 dark:border-blue-900/40 px-4 py-2 rounded-xl rounded-bl-none max-w-[75%]";
 
   bubble.innerText = text;
   wrap.appendChild(bubble);
@@ -227,10 +233,9 @@ async function sendMessage() {
   sendBtn.disabled = true;
 
   const thinking = document.createElement("div");
-  thinking.className = "text-sm text-gray-500 dark:text-gray-400";
+  thinking.className = "text-sm text-gray-500";
   thinking.innerText = "J_ARIS is thinking…";
   chat.appendChild(thinking);
-  chat.scrollTop = chat.scrollHeight;
 
   const systemPrompt = currentMode === "pw" ? PW_CONTEXT : NORMAL_CONTEXT;
 
@@ -271,9 +276,15 @@ input.addEventListener("keydown", e => {
     sendMessage();
   }
 });
+
+/* ================= MOUSE EFFECT ================= */
+document.addEventListener("mousemove", e => {
+  document.getElementById("glow").style.left = e.clientX + "px";
+  document.getElementById("glow").style.top = e.clientY + "px";
+  document.getElementById("cursor").style.left = e.clientX + "px";
+  document.getElementById("cursor").style.top = e.clientY + "px";
+});
 </script>
 
 </body>
 </html>
-
-
